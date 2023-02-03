@@ -38,7 +38,7 @@ func main() {
 	//iterate over the number of rooms to get the room sizes
 	for i := 1; i <= rooms; i++ {
 
-		message = fmt.Sprintf("Could you please give me the width of all room %d walls together in meters?", i)
+		message = fmt.Sprintf("Could you please give me the width of all walls together in room %d in meters?", i)
 		fmt.Println(message)
 		width := o.InputSize(scanner, message)
 
@@ -96,13 +96,14 @@ func main() {
 		total += roomSurface
 	}
 
-	fmt.Println("The total surface that you have requested to paint is:" + strconv.FormatInt(int64(total), 10))
+	fmt.Println("\n\nThe total surface that you have requested to paint is: " + strconv.FormatInt(int64(total), 10) + " square meters.")
 
 	colorMenu := m.GetColorMenu()
 	m.DisplayColor(colorMenu)
 
 	fmt.Println("At the moment we only have white paint with the price od 3 euros/square meter.")
 
-	totalPrice := total * (1 - discount)
-	fmt.Printf("With the discount of %.2f the total price is %.2f.\n", discount, totalPrice)
+	totalPrice := total * (1 - discount) * 3
+	percentage := strconv.FormatInt(int64(discount)*100, 10) + "%"
+	fmt.Printf("With the discount of %s the total price is %.2f euros.\n", percentage, totalPrice)
 }
