@@ -10,7 +10,7 @@ import (
 	u "tsi.co/mod/go-paintProject/utils"
 )
 
-func InputRoomNum(scanner *bufio.Scanner) int {
+func InputRoomNum(scanner *bufio.Scanner, message string) int {
 
 	for scanner.Scan() {
 
@@ -21,7 +21,7 @@ func InputRoomNum(scanner *bufio.Scanner) int {
 		if rooms > 0 {
 			return rooms
 		}
-		fmt.Println("Please enter the number of rooms you want to paint:")
+		fmt.Println(message)
 	}
 	return 0
 }
@@ -36,8 +36,9 @@ func ChangeRoomNum(scanner *bufio.Scanner, roomsOld int) int {
 			fmt.Println("Didn't quite catch that, try again.")
 		} else {
 			if l == "y" {
-				fmt.Println("Please enter the number of rooms you want to paint:")
-				rooms = InputRoomNum(scanner)
+				message := "Please enter the number of rooms you want to paint:"
+				fmt.Println(message)
+				rooms = InputRoomNum(scanner, message)
 				m.DisplayDiscounts(rooms)
 			} else {
 				return rooms
@@ -66,20 +67,4 @@ func InputSize(scanner *bufio.Scanner, message string) float64 {
 		fmt.Println(message)
 	}
 	return 0
-}
-
-func inputDoorNum(scanner *bufio.Scanner) int64 {
-	for scanner.Scan() {
-
-		line := scanner.Text()
-		line = strings.TrimSpace(line)
-
-		doors := u.CheckIfPosInt(line)
-		if doors > 0 {
-			return int64(doors)
-		}
-		fmt.Println("Could you please give me the number of doors in the room?")
-	}
-	return 0
-
 }

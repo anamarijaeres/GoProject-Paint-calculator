@@ -11,45 +11,81 @@ import (
 )
 
 func main() {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("Oops try again")
+			main()
+		}
+	}()
+
 	scanner := bufio.NewScanner(os.Stdin)
 	rooms := 0
-	fmt.Println("Please enter the number of rooms you want to paint:")
-	rooms = o.InputRoomNum(scanner)
 
+	//entering the number of rooms
+	message := "Please enter the number of rooms you want to paint:"
+	fmt.Println(message)
+	rooms = o.InputRoomNum(scanner, message)
+
+	//look at discount menu
 	fmt.Println("Great!Let's look at the possible discounts for the quantity:")
 	discount := m.DisplayDiscounts(rooms)
-	fmt.Println(discount)
-	fmt.Println("Would you like to change the number of rooms(y/n)?")
 
+	//offer the change of the number of rooms after displaying the discount
+	fmt.Println("Would you like to change the number of rooms(y/n)?")
 	rooms = o.ChangeRoomNum(scanner, rooms)
 
-	fmt.Println(rooms)
-
 	surfaceOfRooms := []float64{}
-
+	//iterate over the number of rooms to get the room sizes
 	for i := 1; i <= rooms; i++ {
 
-		message := fmt.Sprintf("Could you please give me the width of room %d in meters?", i)
+		message = fmt.Sprintf("Could you please give me the width of all room %d walls together in meters?", i)
 		fmt.Println(message)
 		width := o.InputSize(scanner, message)
+
 		message = fmt.Sprintf("Could you please give me the height of room %d in meters?", i)
 		fmt.Println(message)
 		height := o.InputSize(scanner, message)
+
 		surfaceW := width * height
 		fmt.Println("Great! The size of the first room is " + strconv.FormatInt(int64(surfaceW), 10) + " square meters.")
 
-		fmt.Println("How many doors there are in the room?")
-		doorNum := o.InputRoomNum(scanner)
+		//get the number of doors in the room
+		message := "Could you please give me the number of doors in the room?"
+		fmt.Println(message)
+		doorNum := o.InputRoomNum(scanner, message)
+
+		//get the width of all the doors in the room
 		message = fmt.Sprintf("Could you please give me the width of doors in room %d in meters?", i)
 		fmt.Println(message)
 		doorWidth := o.InputSize(scanner, message)
+		//make sure that users input is valid
+		for doorWidth*float64(doorNum) > width {
+			fmt.Println("Sorry, can't have doors wider than your wall :(")
+			fmt.Println(message)
+			doorWidth = o.InputSize(scanner, message)
+		}
+
+		//get the height of all the doors in the room
 		message = fmt.Sprintf("Could you please give me the height of doors in room %d in meters?", i)
 		fmt.Println(message)
 		doorHeight := o.InputSize(scanner, message)
+		//make sure that users input is valid
+		for doorHeight > height {
+			fmt.Println("Sorry, can't have doors higher than your wall :(")
+			fmt.Println(message)
+			doorHeight = o.InputSize(scanner, message)
+		}
+
 		surfaceDoors := int64(doorNum) * int64(doorHeight) * int64(doorWidth)
 		fmt.Println("Great! The total surface of the doors in the room is:" + strconv.FormatInt(int64(surfaceDoors), 10) + " square meters.")
 
 		surfaceToPaint := surfaceW - float64(surfaceDoors)
+		//make sure that surface to paint is not negative
+		if surfaceToPaint < 0 {
+			panic("Oh no something went wrong :(((")
+		}
+
+		//put all the surfaces to paint in a slice
 		surfaceOfRooms = append(surfaceOfRooms, surfaceToPaint)
 		fmt.Println("The surface that needs to be painted is " + strconv.FormatInt(int64(surfaceToPaint), 10) + " square meters.")
 	}
@@ -60,10 +96,13 @@ func main() {
 		total += roomSurface
 	}
 
-	fmt.Println("The total size is:" + strconv.FormatInt(int64(total), 10))
+	fmt.Println("The total surface that you have requested to paint is:" + strconv.FormatInt(int64(total), 10))
 
-	fmt.Println("The price by square meter is 3 euros.")
+	colorMenu := m.GetColorMenu()
+	m.DisplayColor(colorMenu)
+
+	fmt.Println("At the moment we only have white paint with the price od 3 euros/square meter.")
 
 	totalPrice := total * (1 - discount)
-	fmt.Printf("With the discount of %f the total price is %f.\n", discount, totalPrice)
+	fmt.Printf("With the discount of %.2f the total price is %.2f.\n", discount, totalPrice)
 }
